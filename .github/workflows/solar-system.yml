@@ -7,10 +7,10 @@ on:
       - main
       - 'feature/*'
 
-# env:
-#     MONGO_URI: 'mongodb+srv://supercluster.d83jj.mongodb.net/superData'
-#     MONGO_USERNAME: ${{ vars.MONGO_USERNAME }}
-#     MONGO_PASSWORD: ${{ secrets.MONGO_PASSWORD }}     
+env:
+    MONGO_URI: 'mongodb+srv://supercluster.d83jj.mongodb.net/superData'
+    MONGO_USERNAME: ${{ vars.MONGO_USERNAME }}
+    MONGO_PASSWORD: ${{ secrets.MONGO_PASSWORD }}     
 
 jobs:
     unit-testing:
@@ -149,6 +149,8 @@ jobs:
             
             echo Testing Image URL using wget 
             wget -q -O - 127.0.0.1:3000/live | grep live
+
+            docker rm -f solar-system-app
 
         - name: Docker Registry Push
           uses: docker/build-push-action@v4
