@@ -167,22 +167,42 @@ jobs:
         needs: docker
         runs-on: github-runner
         steps:
-          - name: Checkout Repository
-            uses: actions/checkout@v4
-          
-          - name: Install Kubectl CLI
-            uses: azure/setup-kubectl@v3
-            with:
-              version: 'v1.26.0'
+            - name: Checkout Repository
+              uses: actions/checkout@v4
+            
+            - name: Install Kubectl CLI
+              uses: azure/setup-kubectl@v3
+              with:
+                version: 'v1.26.0'
 
-          - name: Set Kubeconfig
-            uses: Azure/k8s-set-context@v3
-            with:
-              method: kubeconfig
-              kubeconfig: ${{ secrets.KUBECONFIG }}
+            - name: Set Kubeconfig
+              uses: Azure/k8s-set-context@v3
+              with:
+                method: kubeconfig
+                kubeconfig: ${{ secrets.KUBECONFIG }}
 
-          - name: Fetch Kubernetes Cluster Details
-            run: |
-              kubectl version --short
-              echo ------------------------------------
-              kubectl get nodes
+            - name: Fetch Kubernetes Cluster Details
+              run: |
+                kubectl version --short
+                echo ------------------------------------
+                kubectl get nodes
+
+            - name: Save Nginx Ingress Controller IP as a GITHUB Environment Variable
+              run: |
+                echo "INGRESS_IP=$(ip route get 8.8.8.8 | awk '{print $7}')" >> $GITHUB_ENV
+            
+            - name: Replace Token in Manifest files
+              uses: cschleiden/replace-tokens@v1
+              with:
+                tokenPrefix: '_{_'
+                tokenSuffix: '_}_'
+                files: '["kubernetes/deployment/*.yaml"]'
+              env:
+                NAMESPACE: ${{ vars.NAMESPACE }}
+                REPLICAS: ${{ vars.REPLICAS }}
+                IMAGE: ${{ vars.DOCKERHUB_USERNAME }}/solar-system:${{ github.sha }}
+                INGRESS_IP:  ${{ env.INGRESS_IP }}
+
+            - name: Check files
+              run: |
+                cat kubernetes/deployment/*.yaml
