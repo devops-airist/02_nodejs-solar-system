@@ -219,7 +219,7 @@ jobs:
               
             - name: Deploy to Dev Env
               run: |
-                kubectl apply -f kubernetes/development/*.yaml
+                kubectl apply -k kubernetes/development/
   
             - name: Set App Ingress Host URL
               id: set-ingress-host-address
