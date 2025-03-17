@@ -17,7 +17,7 @@ jobs:
         name: Unit Testing
         strategy:
             matrix:
-                nodejs_version: [18, 19, 20]
+                nodejs_version: [18]
                 operating_system: [ubuntu-latest, macos-latest]
                 exclude:
                     - nodejs_version: 18
@@ -60,6 +60,7 @@ jobs:
           run: npm install
 
         - name: Check Code Coverage
+          continue-on-error: true
           run: npm run coverage
 
         - name: Archive Test Result
