@@ -169,6 +169,8 @@ jobs:
     dev-deploy:
         name: Dev Deployment
         needs: docker
+        outputs:
+          APP_INGRESS_URL: ${{ steps.set-ingress-host-address.outputs.APP_INGRESS_HOST }}
         runs-on: self-hosted
         steps:
           - name: Checkout Repository
@@ -233,7 +235,7 @@ jobs:
     integration-testing:
         name: Dev Integration Testing
         needs: dev-deploy
-        runs-on: ubuntu-latest
+        runs-on: self-hosted
         steps:
           - name: Test URL Output using CURL and JQ
             env:
