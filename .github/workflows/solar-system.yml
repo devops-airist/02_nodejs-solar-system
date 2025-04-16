@@ -169,6 +169,9 @@ jobs:
     dev-deploy:
         name: Dev Deployment
         needs: docker
+        environment: 
+          name: development
+          url: https://${{ steps.set-ingress-host-address.outputs.APP_INGRESS_HOST }}
         outputs:
           APP_INGRESS_URL: ${{ steps.set-ingress-host-address.outputs.APP_INGRESS_HOST }}
         runs-on: self-hosted
@@ -237,6 +240,10 @@ jobs:
         needs: dev-deploy
         runs-on: self-hosted
         steps:
+          - name: Install jq
+            run: |
+              sudo apt-get install -y jq
+
           - name: Test URL Output using CURL and JQ
             env:
               URL: ${{ needs.dev-deploy.outputs.APP_INGRESS_URL }}
