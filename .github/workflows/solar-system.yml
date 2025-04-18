@@ -167,10 +167,9 @@ jobs:
         #         ghcr.io/${{ github.repository_owner }}/solar-system:${{ github.sha }}
 
     dev-deploy:
-        name: Dev Deployment
         if: contains(github.ref, 'feature/')
         needs: docker
-        uses: .github/workflows/reuse-deployment.yml   
+        uses: .github/workflows/reuse-deployment.yml 
 
     dev-integration-testing:
         name: Dev Integration Testing
