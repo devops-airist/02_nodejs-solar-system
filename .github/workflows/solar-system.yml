@@ -127,9 +127,16 @@ jobs:
              mv cobertura-coverage.xml reports-${{ github.sha }}/
              mv test-results.xml reports-${{ github.sha }}/
              ls -ltr reports-${{ github.sha }}/
- 
-         - name: Upload to AWS S3
-           run: echo "uploading......"
+
+         - name: Minio Deploy
+           uses: lovellfelix/minio-deploy-action@v1
+           with:
+             endpoint: ${{ secrets.MINIO_ENDPOINT }}
+             access_key: ${{ secrets.MINIO_ACCESS_KEY }}
+             secret_key: ${{ secrets.MINIO_SECRET_KEY }}
+             bucket: 'bucket-pipeline'
+             source_dir 'reports-${{ github.sha }}'
+             target_dir: 'reports-${{ github.sha }}'
 
     docker:
         name: Containerization
