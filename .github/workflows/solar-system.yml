@@ -135,7 +135,7 @@ jobs:
              access_key: ${{ secrets.MINIO_ACCESS_KEY }}
              secret_key: ${{ secrets.MINIO_SECRET_KEY }}
              bucket: 'bucket-pipeline'
-             source_dir 'reports-${{ github.sha }}'
+             source_dir: 'reports-${{ github.sha }}'
              target_dir: 'reports-${{ github.sha }}'
 
     docker:
