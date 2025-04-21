@@ -128,15 +128,17 @@ jobs:
              mv test-results.xml reports-${{ github.sha }}/
              ls -ltr reports-${{ github.sha }}/
 
-         - name: Minio Deploy
-           uses: lovellfelix/minio-deploy-action@v1
-           with:
-             endpoint: ${{ secrets.MINIO_ENDPOINT }}
-             access_key: ${{ secrets.MINIO_ACCESS_KEY }}
-             secret_key: ${{ secrets.MINIO_SECRET_KEY }}
-             bucket: 'bucket-pipeline'
-             source_dir: 'reports-${{ github.sha }}'
-             target_dir: 'reports-${{ github.sha }}'
+        #  - name: Upload to AWS S3
+        #    uses: jakejarvis/s3-sync-action@master
+        #    with:
+        #      args:  --follow-symlinks --delete
+        #    env:
+        #      AWS_S3_BUCKET: solar-system-reports-bucket
+        #      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        #      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        #      AWS_REGION: 'us-east-1'                       
+        #      SOURCE_DIR: 'reports-${{ github.sha }}'
+        #      DEST_DIR: 'reports-${{ github.sha }}'
 
     docker:
         name: Containerization
@@ -252,3 +254,21 @@ jobs:
               echo $URL
               echo "--------------------------------------------"
               curl http://$URL/live -s -k | jq -r .status | grep -i live
+
+    slack-notification:
+      if: always()
+      name: Slack Notification
+      needs: [dev-integration-testing, prod-integration-testing]
+      continue-on-error: true
+      runs-on: ubuntu-latest
+      steps:
+      - uses: actions/checkout@v4
+      - name: Slack Notification
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_CHANNEL: github-notifications
+          SLACK_COLOR: ${{ job.status }} # or a specific color like 'good' or '#ff00ff'
+          SLACK_ICON: https://gitlab.com/sidd-harth/solar-system/-/raw/main/images/saturn.png
+          SLACK_MESSAGE: ':hammer_and_wrench Triggered by ${{github.actor}}'
+          SLACK_TITLE: Information
